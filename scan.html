@@ -411,6 +411,36 @@
       50% { opacity: 1; }
     }
 
+    .consent-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 28px;
+      margin-top: 4px;
+    }
+
+    .consent-row input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      margin-top: 2px;
+      flex-shrink: 0;
+      accent-color: var(--gold);
+      cursor: pointer;
+    }
+
+    .consent-row label {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.6;
+      cursor: pointer;
+      font-weight: 300;
+    }
+
+    .consent-row a {
+      color: var(--gold);
+      text-decoration: none;
+    }
+
     /* PREVIEW */
     .preview { display: none; }
     .preview.show {
@@ -1104,7 +1134,10 @@
         <input type="email" id="contact_email" placeholder="you@email.com" />
       </div>
 
-      <div class="hint" style="margin-top: -8px; margin-bottom: 28px;">Your scores reveal on the next screen. We'll only email you if there's something we can directly help with.</div>
+      <div class="consent-row">
+        <input type="checkbox" id="consent" />
+        <label for="consent">I agree that Booked may store my answers to personalise follow-up. My data will not be sold or shared with third parties. I can request removal at any time by emailing <a href="mailto:boldcapetown@gmail.com">boldcapetown@gmail.com</a>.</label>
+      </div>
 
       <div class="nav">
         <button type="button" class="btn-back" onclick="goBackFromContact()">Back</button>
@@ -1491,8 +1524,13 @@ Return ONLY valid JSON, no markdown, no explanation:
     // Validate contact
     const name = document.getElementById('contact_name')?.value?.trim() || '';
     const email = document.getElementById('contact_email')?.value?.trim() || '';
+    const consent = document.getElementById('consent')?.checked;
     if (!name || !email || !email.includes('@')) {
       alert('Please enter your name and a valid email to see your scores.');
+      return;
+    }
+    if (!consent) {
+      alert('Please check the consent box to continue.');
       return;
     }
 
