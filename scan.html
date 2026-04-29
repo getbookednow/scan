@@ -1378,16 +1378,33 @@
         mode: 'no-cors',
         headers: { 'Content-Type': 'text/plain' },
         body: JSON.stringify({
+          timestamp: new Date().toISOString(),
           name: formData.name,
           email: formData.email,
+          // About
           niche: formData.q1,
-          website: formData.q3_url || formData.q3,
+          niche_specific: formData.q1b,
+          ideal_client: formData.q2,
+          how_clients_find: formData.q2b,
+          // Digital presence
+          has_website: formData.q3,
+          website_url: formData.q3_url || '',
+          site_navigability: formData.q3b,
+          platforms: (formData.platforms || []).join(', '),
           instagram_bio: formData.q5,
+          // Visibility
+          google_name_search: formData.q6,
+          google_niche_search: formData.q6b,
+          directories: formData.q7,
+          discovery_channel: formData.q8,
+          // AI readiness
+          ai_search_test: formData.q9,
+          name_consistency: formData.q10,
+          external_content: formData.q11,
+          // Scores
           ai_score: scores.ai,
           vis_score: scores.vis,
-          total_score: scores.ai + scores.vis,
-          timestamp: new Date().toISOString(),
-          platforms: (formData.platforms || []).join(', ')
+          total_score: scores.ai + scores.vis
         })
       });
     } catch(e) {
