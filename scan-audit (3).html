@@ -1,0 +1,1577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SCAN — Booked</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0e0a1a;
+      --bg-2: #130f22;
+      --gold: #C8A96E;
+      --gold-light: #e2c98a;
+      --gold-dim: rgba(200,169,110,0.05);
+      --border: rgba(200,169,110,0.3);
+      --border-dim: rgba(200,169,110,0.12);
+      --text: #f0ede8;
+      --muted: #9a9a9a;
+      --dim: #555;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Helvetica Neue', Helvetica, sans-serif;
+      font-weight: 300;
+      font-size: 20px;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.4;
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(ellipse at 60% 40%, rgba(120,80,200,0.12) 0%, transparent 60%), radial-gradient(ellipse at 20% 80%, rgba(80,40,160,0.08) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .wrap {
+      position: relative;
+      z-index: 1;
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 80px 28px 120px;
+    }
+
+    /* HEADER */
+    .header {
+      margin-bottom: 64px;
+      opacity: 0;
+      animation: rise 0.9s cubic-bezier(0.22,1,0.36,1) 0.1s forwards;
+    }
+
+    .booked-tag {
+      font-family: 'Helvetica Neue', Helvetica, sans-serif;
+      font-size: 11px;
+      letter-spacing: 0.35em;
+      color: var(--gold);
+      text-transform: uppercase;
+      margin-bottom: 28px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .booked-tag::before {
+      content: '';
+      display: block;
+      width: 2.5rem;
+      height: 1px;
+      background: var(--gold);
+    }
+
+    .header h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(52px, 9vw, 80px);
+      font-weight: 600;
+      line-height: 1.0;
+      letter-spacing: -1px;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .subtitle-line {
+      font-family: 'Helvetica Neue', Helvetica, sans-serif;
+      font-size: 11px;
+      letter-spacing: 0.22em;
+      color: var(--gold);
+      text-transform: uppercase;
+      margin-bottom: 24px;
+      opacity: 0.8;
+    }
+
+    .header-desc {
+      font-size: 20px;
+      color: var(--muted);
+      line-height: 1.75;
+      max-width: 480px;
+    }
+
+    /* PROGRESS */
+    .progress-wrap {
+      margin-bottom: 56px;
+      opacity: 0;
+      animation: rise 0.6s ease 0.35s forwards;
+    }
+
+    .progress-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .progress-label {
+      font-family: 'Helvetica Neue', Helvetica, sans-serif;
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      color: var(--gold);
+      text-transform: uppercase;
+      opacity: 0.9;
+    }
+
+    .progress-track {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .progress-seg {
+      height: 2px;
+      flex: 1;
+      background: rgba(201,169,97,0.15);
+      position: relative;
+      overflow: hidden;
+      border-radius: 2px;
+    }
+
+    .progress-seg::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: var(--gold);
+      transform: translateX(-100%);
+      transition: transform 0.5s cubic-bezier(0.22,1,0.36,1);
+    }
+
+    .progress-seg.done::after { transform: translateX(0); }
+    .progress-seg.active::after { transform: translateX(0); }
+
+    /* STEPS */
+    .step { display: none; }
+    .step.active {
+      display: block;
+      animation: rise 0.5s cubic-bezier(0.22,1,0.36,1) forwards;
+    }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(14px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .step-eyebrow {
+      font-family: 'Helvetica Neue', Helvetica, sans-serif;
+      font-size: 10px;
+      letter-spacing: 0.3em;
+      color: var(--dim);
+      text-transform: uppercase;
+      margin-bottom: 36px;
+    }
+
+    /* FIELDS */
+    .field {
+      border: none; margin-bottom: 40px; }
+
+    .field label {
+      display: block;
+      font-size: 20px;
+      color: var(--text);
+      font-weight: 400;
+      margin-bottom: 6px;
+      line-height: 1.5;
+    }
+
+    .field .hint {
+      font-size: 14px;
+      color: var(--dim);
+      margin-bottom: 12px;
+      font-style: italic;
+    }
+
+    .field input,
+    .field textarea,
+    .field select {
+      width: 100%;
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid var(--border-dim);
+      color: var(--text);
+      font-family: 'Helvetica Neue', Helvetica, sans-serif;
+      font-size: 20px;
+      font-weight: 300;
+      padding: 14px 0 16px;
+      transition: border-color 0.25s;
+      outline: none;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    .field input::placeholder,
+    .field textarea::placeholder { color: var(--dim); }
+
+    .field input:focus,
+    .field textarea:focus,
+    .field select:focus { border-bottom-color: var(--gold); }
+
+    .field textarea { resize: none; min-height: 80px; }
+
+    .field select {
+      cursor: pointer;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23C9A961' stroke-width='1.2' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 2px center;
+      padding-right: 20px;
+    }
+
+    .field select option { background: #0f1430; color: var(--text); }
+
+    .chip-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding-top: 10px;
+    }
+
+    .chip-group input[type="checkbox"] { display: none; }
+
+    .chip {
+      border: 1px solid var(--border-dim);
+      border-radius: 2px;
+      padding: 10px 20px;
+      font-size: 18px;
+      font-family: 'Helvetica Neue', Helvetica, sans-serif;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.2s;
+      user-select: none;
+    }
+
+    .chip:hover { border-color: var(--gold); color: var(--text); }
+    .chip-group input:checked + .chip {
+      border-color: var(--gold);
+      color: var(--gold);
+      background: var(--gold-dim);
+    }
+
+    /* DIVIDER */
+    .field-divider { display: none; }
+    .field { border-bottom: none !important; }
+
+    /* NAV */
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 48px;
+      padding-top: 0;
+      border-top: none;
+    }
+
+    .btn-back {
+      background: none;
+      border: none;
+      color: var(--dim);
+      font-family: 'Helvetica Neue', Helvetica, sans-serif;
+      font-size: 18px;
+      cursor: pointer;
+      padding: 0;
+      transition: color 0.2s;
+      letter-spacing: 0.05em;
+    }
+
+    .btn-back:hover { color: var(--muted); }
+    .btn-back.hidden { visibility: hidden; }
+
+    .nav-meta {
+      font-family: 'Helvetica Neue', Helvetica, sans-serif;
+      font-size: 11px;
+      color: var(--dim);
+      letter-spacing: 0.2em;
+    }
+
+    .btn-next {
+      background: none;
+      border: 1px solid var(--gold);
+      color: var(--gold);
+      font-family: 'Helvetica Neue', Helvetica, sans-serif;
+      font-size: 18px;
+      font-weight: 400;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 13px 32px;
+      cursor: pointer;
+      transition: all 0.2s;
+      border-radius: 1px;
+    }
+
+    .btn-next:hover { background: var(--gold); color: var(--bg); }
+
+    /* LOADING */
+    .loading {
+      display: none;
+      text-align: center;
+      padding: 80px 0;
+    }
+
+    .loading.show { display: block; animation: rise 0.4s ease forwards; }
+
+    .loading-text {
+      font-family: 'Helvetica Neue', Helvetica, sans-serif;
+      font-size: 13px;
+      letter-spacing: 0.25em;
+      color: var(--gold);
+      text-transform: uppercase;
+      margin-bottom: 24px;
+    }
+
+    .loading-bar {
+      width: 200px;
+      height: 1px;
+      background: var(--border-dim);
+      margin: 0 auto;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .loading-bar::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: var(--gold);
+      animation: scan 1.8s ease-in-out infinite;
+    }
+
+    @keyframes scan {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+
+    /* PREVIEW */
+    .preview { display: none; }
+    .preview.show {
+      display: block;
+      animation: rise 0.7s cubic-bezier(0.22,1,0.36,1) forwards;
+    }
+
+    .preview-header {
+      margin-bottom: 48px;
+    }
+
+    .preview-header h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 48px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .preview-header p {
+      font-size: 17px;
+      color: var(--muted);
+    }
+
+    /* SCORES */
+    .scores-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2px;
+      margin-bottom: 2px;
+    }
+
+    .score-card {
+      background: var(--bg-2);
+      border: 1px solid rgba(200,169,110,0.15);
+      padding: 40px 32px;
+      position: relative;
+      overflow: hidden;
+      text-align: center;
+      transition: border-color 0.4s;
+    }
+
+    .score-card.reveal {
+      border-color: rgba(200,169,110,0.35);
+    }
+
+    .score-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 50%;
+      width: 30px; height: 1px;
+      background: var(--gold);
+      transform: translateX(-50%) scaleX(0);
+      transition: transform 0.8s cubic-bezier(0.22,1,0.36,1) 0.2s;
+    }
+
+    .score-card.reveal::before { transform: translateX(-50%) scaleX(1); }
+
+    .score-name {
+      font-family: 'Helvetica Neue', Helvetica, sans-serif;
+      font-size: 0.65rem;
+      font-weight: 400;
+      letter-spacing: 0.28em;
+      color: var(--gold);
+      text-transform: uppercase;
+      margin-bottom: 28px;
+    }
+
+    .score-display {
+      display: flex;
+      align-items: baseline;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .score-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 5.5rem;
+      font-weight: 300;
+      color: var(--gold);
+      line-height: 1;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 0.8s cubic-bezier(0.22,1,0.36,1);
+    }
+
+    .score-num.reveal { opacity: 1; transform: translateY(0); }
+
+    .score-denom {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.5rem;
+      font-weight: 300;
+      color: var(--muted);
+      line-height: 1;
+    }
+
+    .score-divider {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2rem;
+      font-weight: 300;
+      color: var(--muted);
+      line-height: 1;
+      margin: 0 4px;
+    }
+
+    .score-desc {
+      font-size: 15px;
+      color: var(--muted);
+      line-height: 1.6;
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border-dim);
+      opacity: 0;
+      transition: opacity 0.6s ease 0.6s;
+    }
+
+    .score-desc.reveal { opacity: 1; }
+
+    .total-row {
+      background: var(--bg-2);
+      border: 1px solid var(--border-dim);
+      padding: 24px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 40px;
+    }
+
+    .total-label {
+      font-family: 'Helvetica Neue', Helvetica, sans-serif;
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    .total-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 37px;
+      color: var(--text);
+      opacity: 0;
+      transition: opacity 0.5s ease 1s;
+    }
+
+    .total-num.reveal { opacity: 1; }
+
+    /* INSIGHTS */
+    .section-label {
+      font-family: 'Helvetica Neue', Helvetica, sans-serif;
+      font-size: 10px;
+      letter-spacing: 0.3em;
+      color: var(--dim);
+      text-transform: uppercase;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border-dim);
+    }
+
+    .insight-list {
+      list-style: none;
+      margin-bottom: 40px;
+    }
+
+    .insight-item {
+      padding: 20px 0;
+      border-bottom: 1px solid var(--border-dim);
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+      opacity: 0;
+      transform: translateY(8px);
+      transition: all 0.5s ease;
+    }
+
+    .insight-item.reveal { opacity: 1; transform: translateY(0); }
+
+    .insight-num {
+      font-family: 'Helvetica Neue', Helvetica, sans-serif;
+      font-size: 11px;
+      color: var(--gold);
+      letter-spacing: 0.1em;
+      flex-shrink: 0;
+      padding-top: 2px;
+    }
+
+    .insight-body h4 {
+      font-size: 17px;
+      font-weight: 500;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .insight-body p {
+      font-size: 15px;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    /* QUICK WIN */
+    .quick-win {
+      border: 1px solid var(--border);
+      padding: 28px;
+      background: var(--gold-dim);
+      margin-bottom: 40px;
+      opacity: 0;
+      transition: opacity 0.5s ease 1.4s;
+    }
+
+    .quick-win.reveal { opacity: 1; }
+
+    .quick-win-label {
+      font-family: 'Helvetica Neue', Helvetica, sans-serif;
+      font-size: 10px;
+      letter-spacing: 0.3em;
+      color: var(--gold);
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .quick-win h4 {
+      font-size: 20px;
+      font-weight: 500;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .quick-win p {
+      font-size: 18px;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    /* STANDING */
+    .standing {
+      border: 1px solid var(--border-dim);
+      padding: 28px;
+      margin-bottom: 48px;
+      background: var(--bg-2);
+      opacity: 0;
+      transition: opacity 0.5s ease 1.6s;
+    }
+
+    .standing.reveal { opacity: 1; }
+
+    .standing-label {
+      font-family: 'Helvetica Neue', Helvetica, sans-serif;
+      font-size: 10px;
+      letter-spacing: 0.3em;
+      color: var(--dim);
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .standing h4 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 26px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .standing p {
+      font-size: 18px;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    /* CTA */
+    .cta {
+      border: none;
+      padding: 48px 40px;
+      text-align: center;
+      background: var(--bg-2);
+      border: 1px solid rgba(200,169,110,0.25);
+    }
+
+    .cta h3 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 35px;
+      font-weight: 300;
+      margin-bottom: 12px;
+      color: var(--gold);
+    }
+
+    .cta p {
+      color: #f0ede8;
+      font-size: 16px;
+      line-height: 1.75;
+      margin-bottom: 32px;
+      max-width: 400px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .btn-unlock {
+      background: var(--gold);
+      border: none;
+      color: #080808;
+      font-family: 'Helvetica Neue', Helvetica, sans-serif;
+      font-size: 18px;
+      font-weight: 500;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      padding: 18px 52px;
+      cursor: pointer;
+      transition: opacity 0.2s;
+      width: 100%;
+      max-width: 340px;
+      border-radius: 1px;
+      display: block;
+      margin: 0 auto 16px;
+    }
+
+    .btn-unlock:hover { opacity: 0.88; }
+
+    .price-tag {
+      font-family: 'Helvetica Neue', Helvetica, sans-serif;
+      font-size: 13px;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+    }
+
+    .includes {
+      margin-top: 28px;
+      text-align: left;
+      padding-top: 24px;
+    }
+
+    .includes-label {
+      font-family: 'Helvetica Neue', Helvetica, sans-serif;
+      font-size: 10px;
+      letter-spacing: 0.25em;
+      color: var(--dim);
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+
+    .includes ul {
+      list-style: none;
+    }
+
+    .includes li {
+      font-size: 0.85rem;
+      color: #f0ede8;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(200,169,110,0.12);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .includes li::before {
+      content: '→';
+      color: var(--gold);
+      font-size: 13px;
+    }
+
+    /* ── RESPONSIVE ── */
+    /* ── RESPONSIVE ── */
+
+    /* Mobile first */
+    .wrap { padding: 52px 24px 90px; }
+    .header { margin-bottom: 52px; }
+    .header h1 { font-size: 52px; font-weight: 600; letter-spacing: -1px; }
+    .subtitle-line { font-size: 9px; letter-spacing: 0.28em; }
+    .booked-tag { font-size: 9px; letter-spacing: 0.32em; }
+    .header-desc { font-size: 14px; line-height: 1.75; color: #9CA3AF; }
+    .step-eyebrow { font-size: 9px; letter-spacing: 0.28em; }
+    .field label { font-size: 15px; font-weight: 400; }
+    .field input, .field textarea, .field select { font-size: 15px; padding: 12px 0 14px; }
+    .chip { font-size: 13px; padding: 8px 16px; }
+    .btn-next { font-size: 11px; padding: 13px 28px; letter-spacing: 0.18em; }
+    .btn-back { font-size: 12px; }
+    .nav-meta { font-size: 9px; }
+    .score-num { font-size: 64px; }
+    .score-name { font-size: 9px; letter-spacing: 0.25em; }
+    .score-card { padding: 28px 24px; }
+    .scores { grid-template-columns: 1fr 1fr; gap: 2px; }
+    .total-card { padding: 22px 24px; }
+    .total-num { font-size: 32px; }
+    .total-label { font-size: 9px; letter-spacing: 0.22em; }
+    .section-eyebrow { font-size: 9px; letter-spacing: 0.28em; }
+    .desc { font-size: 13px; line-height: 1.7; }
+    .insight-item h4 { font-size: 14px; font-weight: 500; }
+    .insight-item p { font-size: 13px; line-height: 1.65; }
+    .insight-num { font-size: 11px; }
+    .quick-win { padding: 24px 22px; }
+    .quick-win-eyebrow { font-size: 9px; letter-spacing: 0.25em; }
+    .quick-win h4 { font-size: 16px; }
+    .quick-win p { font-size: 13px; line-height: 1.65; }
+    .standing { padding: 24px 22px; }
+    .standing-eyebrow { font-size: 9px; letter-spacing: 0.25em; }
+    .standing h4 { font-size: 22px; font-family: 'Cormorant Garamond', serif; font-weight: 600; }
+    .standing p { font-size: 13px; line-height: 1.7; }
+    .preview-eyebrow { font-size: 9px; letter-spacing: 0.28em; }
+    .cta { padding: 44px 28px; }
+    .cta h3 { font-size: 28px; font-family: 'Cormorant Garamond', serif; font-weight: 600; }
+    .cta p { font-size: 14px; line-height: 1.75; }
+    .btn-unlock { font-size: 11px; padding: 16px 44px; letter-spacing: 0.18em; }
+    .price-tag { font-size: 10px; letter-spacing: 0.12em; }
+    .includes-label { font-size: 9px; letter-spacing: 0.28em; }
+    .includes-item { font-size: 13px; }
+
+    /* Tablet (640px+) */
+    @media (min-width: 640px) {
+      .wrap { padding: 68px 36px 100px; }
+      .header h1 { font-size: 64px; }
+      .header-desc { font-size: 15px; }
+      .field label { font-size: 15px; }
+      .score-num { font-size: 72px; }
+      .score-card { padding: 32px 28px; }
+      .cta { padding: 52px 40px; }
+      .cta h3 { font-size: 32px; }
+      .standing h4 { font-size: 26px; }
+      .quick-win h4 { font-size: 17px; }
+    }
+
+    /* Desktop (1024px+) */
+    @media (min-width: 1024px) {
+      .wrap { padding: 88px 28px 130px; max-width: 700px; }
+      .header h1 { font-size: clamp(64px, 9vw, 88px); }
+      .header-desc { font-size: 15px; }
+      .field label { font-size: 15px; }
+      .field input, .field textarea, .field select { font-size: 15px; }
+      .score-num { font-size: 80px; }
+      .cta h3 { font-size: 34px; }
+      .standing h4 { font-size: 28px; }
+    }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="booked-tag">Booked</div>
+    <h1>Scan</h1>
+    <div class="subtitle-line">AI Discoverability + Visibility Audit</div>
+    <p class="header-desc">Find out exactly where you stand across AI discoverability and digital visibility — the two things that determine whether the right people can find you. Takes less than 5 minutes.</p>
+  </header>
+
+  <!-- PROGRESS -->
+  <div class="progress-wrap" id="progressWrap">
+    <div class="progress-meta">
+      <span class="progress-label" id="progressLabel">Step 1 of 4</span>
+    </div>
+    <div class="progress-track" id="progressTrack">
+      <div class="progress-seg" id="seg0"></div>
+      <div class="progress-seg" id="seg1"></div>
+      <div class="progress-seg" id="seg2"></div>
+      <div class="progress-seg" id="seg3"></div>
+    </div>
+  </div>
+
+  <!-- FORM -->
+  <form id="auditForm" novalidate>
+
+    <!-- STEP 1: About You -->
+    <div class="step active" data-step="1">
+      <div class="step-eyebrow">01 — About You</div>
+
+      <div class="field">
+        <label>What is your creative niche?</label>
+        <select id="q1">
+          <option value="" disabled selected>Select your niche</option>
+          <option>Photographer</option>
+          <option>Stylist</option>
+          <option>Art Director</option>
+          <option>Creative Director</option>
+          <option>Model</option>
+          <option>Hair & Makeup Artist</option>
+          <option>Videographer</option>
+          <option>Other</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>What specific type of work do you do within that niche?</label>
+        <div class="hint">Be specific — this is what helps AI systems understand who you are.</div>
+        <input type="text" id="q1b" placeholder="e.g. Editorial lookbooks for luxury fashion brands" />
+      </div>
+
+      <div class="field">
+        <label>Who is your ideal client or collaborator?</label>
+        <input type="text" id="q2" placeholder="e.g. Luxury fashion brands, editorial magazines, emerging designers" />
+      </div>
+
+      <div class="field">
+        <label>How do your ideal clients typically find and hire creatives like you?</label>
+        <select id="q2b">
+          <option value="" disabled selected>Select the most common way</option>
+          <option value="referral">Referrals from other creatives</option>
+          <option value="instagram">Instagram / social media</option>
+          <option value="google">Google search</option>
+          <option value="agency">Through agencies or platforms</option>
+          <option value="directory">Industry directories</option>
+          <option value="unsure">I'm not sure</option>
+        </select>
+      </div>
+
+      <div class="nav">
+        <button type="button" class="btn-back hidden">Back</button>
+        <span class="nav-meta">01 / 04</span>
+        <button type="button" class="btn-next" onclick="goNext()">Continue</button>
+      </div>
+    </div>
+
+    <!-- STEP 2: Digital Presence -->
+    <div class="step" data-step="2">
+      <div class="step-eyebrow">02 — Digital Presence</div>
+
+      <div class="field">
+        <label>Do you have a personal website or portfolio?</label>
+        <select id="q3" onchange="toggleUrlField()">
+          <option value="" disabled selected>Select an option</option>
+          <option value="yes_custom">Yes — custom domain (e.g. myname.com)</option>
+          <option value="yes_platform">Yes — on a platform (Squarespace, Wix, etc.)</option>
+          <option value="yes_social">No website — I use social media only</option>
+          <option value="no">No — I don't have one yet</option>
+        </select>
+      </div>
+      <div class="field" id="url-field" style="display:none;">
+        <label>What is your website URL?</label>
+        <input type="text" id="q3_url" placeholder="https://yourname.com" />
+      </div>
+
+      <div class="field">
+        <label>How easy is it for someone to find your rates, contact info, and portfolio on your site?</label>
+        <div class="hint">If you don't have a site, skip to the next question.</div>
+        <select id="q3b">
+          <option value="" disabled selected>Select an option</option>
+          <option value="very_easy">Very easy — everything is on the homepage or one click away</option>
+          <option value="some_effort">Some effort — they'd have to look around</option>
+          <option value="difficult">Difficult — it's not clear where to find anything</option>
+          <option value="no_site">I don't have a site</option>
+        </select>
+      </div>
+
+
+      <div class="field">
+        <label>Which social platforms are you most active on?</label>
+        <div class="chip-group" id="platforms">
+          <label><input type="checkbox" value="Instagram"><span class="chip">Instagram</span></label>
+          <label><input type="checkbox" value="TikTok"><span class="chip">TikTok</span></label>
+          <label><input type="checkbox" value="LinkedIn"><span class="chip">LinkedIn</span></label>
+          <label><input type="checkbox" value="Pinterest"><span class="chip">Pinterest</span></label>
+          <label><input type="checkbox" value="Behance"><span class="chip">Behance</span></label>
+          <label><input type="checkbox" value="None"><span class="chip">None yet</span></label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>How would you describe your Instagram bio right now?</label>
+        <div class="hint">Paste it or describe it — this tells us how you're positioning yourself to the world.</div>
+        <input type="text" id="q5" placeholder="e.g. Cape Town photographer · Editorial & Commercial · DM to book" />
+      </div>
+
+
+      <div class="nav">
+        <button type="button" class="btn-back" onclick="goBack()">Back</button>
+        <span class="nav-meta">02 / 04</span>
+        <button type="button" class="btn-next" onclick="goNext()">Continue</button>
+      </div>
+    </div>
+
+    <!-- STEP 3: Visibility -->
+    <div class="step" data-step="3">
+      <div class="step-eyebrow">03 — Visibility</div>
+
+      <div class="field">
+        <label>When someone Googles your name, what shows up?</label>
+        <select id="q6">
+          <option value="" disabled selected>Select what happens</option>
+          <option value="first">I appear first — my website or portfolio</option>
+          <option value="page1">I appear on page 1 but mixed with other results</option>
+          <option value="other_person">Someone else with my name comes up</option>
+          <option value="nothing">Nothing relevant comes up</option>
+          <option value="never_checked">I've never checked</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>When someone Googles your niche and location (e.g. "fashion photographer Cape Town"), do you appear?</label>
+        <select id="q6b">
+          <option value="" disabled selected>Select an option</option>
+          <option value="yes_top">Yes — I appear in the top results</option>
+          <option value="yes_somewhere">Yes — somewhere on the first page</option>
+          <option value="no">No — I don't appear</option>
+          <option value="unsure">I'm not sure</option>
+        </select>
+      </div>
+
+
+      <div class="field">
+        <label>Are you listed on any industry directories or platforms?</label>
+        <div class="hint">e.g. Agency rosters, model directories, photographer platforms, creative networks.</div>
+        <select id="q7">
+          <option value="" disabled selected>Select an option</option>
+          <option value="multiple">Yes — multiple directories or platforms</option>
+          <option value="one">Yes — one or two</option>
+          <option value="agency_only">I'm represented by an agency</option>
+          <option value="none">No — I'm not listed anywhere</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>How do most people currently discover your work?</label>
+        <select id="q8">
+          <option value="" disabled selected>Select your main discovery channel</option>
+          <option value="referral">Word of mouth / referrals</option>
+          <option value="instagram">Instagram / social media</option>
+          <option value="google">Google search</option>
+          <option value="directory">Industry directories</option>
+          <option value="agency">Agency representation</option>
+          <option value="outbound">People don't find me — I reach out to them</option>
+          <option value="unsure">Not sure</option>
+        </select>
+      </div>
+
+      <div class="nav">
+        <button type="button" class="btn-back" onclick="goBack()">Back</button>
+        <span class="nav-meta">03 / 04</span>
+        <button type="button" class="btn-next" onclick="goNext()">Continue</button>
+      </div>
+    </div>
+
+    <!-- STEP 4: AI Readiness -->
+    <div class="step" data-step="4">
+      <div class="step-eyebrow">04 — AI Readiness</div>
+
+      <div class="field">
+        <label>Have you ever searched for yourself using an AI tool like ChatGPT or Perplexity?</label>
+        <select id="q9">
+          <option value="" disabled selected>Select an option</option>
+          <option value="yes_found">Yes — and I came up in the results</option>
+          <option value="yes_not_found">Yes — and I didn't come up</option>
+          <option value="no">No — I haven't tried</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Does your online presence use your full name consistently across all platforms?</label>
+        <div class="hint">AI systems rely on consistent name + niche signals to identify who you are.</div>
+        <select id="q10">
+          <option value="" disabled selected>Select an option</option>
+          <option value="yes">Yes — same name everywhere</option>
+          <option value="mostly">Mostly — but with some variation</option>
+          <option value="no">No — I use different names or handles</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Do you have any written content online that describes who you are and what you do?</label>
+        <div class="hint">e.g. A bio page, blog posts, press features, interviews, or mentions on other sites.</div>
+        <select id="q11">
+          <option value="" disabled selected>Select an option</option>
+          <option value="multiple">Yes — multiple sources mention me</option>
+          <option value="one_two">Yes — one or two mentions</option>
+          <option value="bio_only">Just my own bio on my site or social</option>
+          <option value="none">No — nothing written about me online</option>
+        </select>
+      </div>
+
+      <div class="nav">
+        <button type="button" class="btn-back" onclick="goBack()">Back</button>
+        <span class="nav-meta">04 / 04</span>
+        <button type="button" class="btn-next" onclick="showContactStep()">Continue</button>
+      </div>
+    </div>
+
+    <!-- CONTACT GATE -->
+    <div class="step" data-step="contact">
+      <div class="step-eyebrow">Final step — where to send your scores</div>
+
+      <div class="field">
+        <label>Your name</label>
+        <input type="text" id="contact_name" placeholder="First and last name" />
+      </div>
+
+      <div class="field">
+        <label>Your email</label>
+        <input type="email" id="contact_email" placeholder="you@email.com" />
+      </div>
+
+      <div class="hint" style="margin-top: -8px; margin-bottom: 28px;">Your scores reveal on the next screen. We'll only email you if there's something we can directly help with.</div>
+
+      <div class="nav">
+        <button type="button" class="btn-back" onclick="goBackFromContact()">Back</button>
+        <span class="nav-meta">Almost there</span>
+        <button type="button" class="btn-next" onclick="submitForm()">Reveal My Scores</button>
+      </div>
+    </div>
+
+  </form>
+
+  <!-- LOADING -->
+  <div class="loading" id="loading">
+    <div class="loading-text">Analysing your presence</div>
+    <div class="loading-bar"></div>
+  </div>
+
+  <!-- PREVIEW -->
+  <div class="preview" id="preview">
+
+    <div class="preview-header">
+      <h2>Your Results</h2>
+      <p>Based on your answers — here's exactly where you stand.</p>
+    </div>
+
+    <!-- SCORES -->
+    <div class="scores-grid">
+      <div class="score-card" id="card-ai">
+        <div class="score-name">AI Discoverability</div>
+        <div class="score-num" id="num-ai">—</div>
+        <div class="score-denom">/ 10</div>
+        <div class="score-desc" id="desc-ai"></div>
+      </div>
+      <div class="score-card" id="card-vis">
+        <div class="score-name">Visibility</div>
+        <div class="score-num" id="num-vis">—</div>
+        <div class="score-denom">/ 10</div>
+        <div class="score-desc" id="desc-vis"></div>
+      </div>
+    </div>
+
+    <div class="total-row">
+      <span class="total-label">Overall Score</span>
+      <span class="total-num" id="num-total">— / 20</span>
+    </div>
+
+    <!-- BLOCKERS -->
+    <div class="section-label">What's holding you back</div>
+    <ul class="insight-list" id="blockers"></ul>
+
+    <!-- QUICK WIN -->
+    <div class="quick-win" id="quickWin">
+      <div class="quick-win-label">Your immediate action — this week</div>
+      <h4 id="quickWinTitle"></h4>
+      <p id="quickWinBody"></p>
+    </div>
+
+    <!-- STANDING -->
+    <div class="standing" id="standing">
+      <div class="standing-label">Where you stand overall</div>
+      <h4 id="standingTitle"></h4>
+      <p id="standingBody"></p>
+    </div>
+
+    <!-- CTA -->
+    <div class="cta">
+      <h3>Unlock Your Full Audit</h3>
+      <p>A personal 30-minute deep dive into your actual digital presence — with a custom 30-day roadmap ranked by impact. Delivered within 5 business days.</p>
+      <button class="btn-unlock" onclick="handlePayment()">Unlock Full Audit</button>
+      <div class="price-tag">USD 130 · ZAR 2,500 · Secure Payment</div>
+        <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid rgba(200,169,110,0.12); text-align: center;">
+          <div style="font-size: 0.65rem; letter-spacing: 0.22em; text-transform: uppercase; color: #9a9a9a; margin-bottom: 10px;">Questions?</div>
+          <a href="https://wa.me/27637549122" target="_blank" style="display: inline-flex; align-items: center; gap: 8px; color: #C8A96E; font-size: 0.85rem; text-decoration: none; letter-spacing: 0.04em; transition: opacity 0.2s;" onmouseover="this.style.opacity='0.75'" onmouseout="this.style.opacity='1'">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="display: inline-block;"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.464 3.488"/></svg>
+            Chat on WhatsApp
+          </a>
+        </div>
+      <div class="includes">
+        <div class="includes-label">What's included</div>
+        <ul>
+          <li>Personal review of your website, social, and Google presence</li>
+          <li>Detailed AI Discoverability breakdown with specific fixes</li>
+          <li>Custom 30-day roadmap — actions ranked by impact</li>
+          <li>Delivered as a PDF report within 5 business days</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+  let current = 1;
+  const totalSteps = 4;
+
+  function toggleUrlField() {
+    const val = document.getElementById('q3').value;
+    const urlField = document.getElementById('url-field');
+    urlField.style.display = (val === 'yes_custom' || val === 'yes_platform') ? 'block' : 'none';
+  }
+
+  function updateProgress() {
+    (document.getElementById('progressLabel') || {}).textContent = `Step ${current} of ${totalSteps}`;
+    for (let i = 0; i < totalSteps; i++) {
+      const seg = document.getElementById('seg' + i);
+      seg.className = 'progress-seg';
+      if (i < current - 1) seg.classList.add('done');
+      else if (i === current - 1) seg.classList.add('active');
+    }
+  }
+
+  function goNext() {
+    if (current < totalSteps) {
+      document.querySelector(`[data-step="${current}"]`).classList.remove('active');
+      current++;
+      document.querySelector(`[data-step="${current}"]`).classList.add('active');
+      updateProgress();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
+
+  function goBack() {
+    if (current > 1) {
+      document.querySelector(`[data-step="${current}"]`).classList.remove('active');
+      current--;
+      document.querySelector(`[data-step="${current}"]`).classList.add('active');
+      updateProgress();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
+
+  function calcScores() {
+    const q3 = document.getElementById('q3').value;
+    const q3b = document.getElementById('q3b')?.value || '';
+    const q6 = document.getElementById('q6').value;
+    const q6b = document.getElementById('q6b')?.value || '';
+    const q7 = document.getElementById('q7').value;
+    const q8 = document.getElementById('q8').value;
+    const q9 = document.getElementById('q9').value;
+    const q10 = document.getElementById('q10').value;
+    const q11 = document.getElementById('q11').value;
+    const platforms = document.querySelectorAll('#platforms input:checked').length;
+
+    // AI Discoverability
+    let ai = 1;
+    if (q3 === 'yes_custom') ai += 2;
+    else if (q3 === 'yes_platform') ai += 1;
+    if (q9 === 'yes_found') ai += 2;
+    else if (q9 === 'yes_not_found') ai += 0;
+    if (q10 === 'yes') ai += 2;
+    else if (q10 === 'mostly') ai += 1;
+    if (q11 === 'multiple') ai += 2;
+    else if (q11 === 'one_two') ai += 1;
+    if (q7 === 'multiple') ai += 1;
+    ai = Math.min(ai, 10);
+
+    // Visibility
+    let vis = 1;
+    if (q6 === 'first') vis += 3;
+    else if (q6 === 'page1') vis += 2;
+    if (q6b === 'yes_top') vis += 2;
+    else if (q6b === 'yes_somewhere') vis += 1;
+    if (q7 === 'multiple') vis += 1;
+    else if (q7 === 'one') vis += 0.5;
+    if (q8 === 'google' || q8 === 'directory') vis += 2;
+    else if (q8 === 'instagram' || q8 === 'agency') vis += 1;
+    if (platforms >= 3) vis += 1;
+    else if (platforms >= 1) vis += 0.5;
+    vis = Math.round(Math.min(vis, 10));
+    ai = Math.round(ai);
+
+    return { ai, vis };
+  }
+
+  function getDescriptions(ai, vis, data) {
+    const q6 = document.getElementById('q6').value;
+    const q9 = document.getElementById('q9').value;
+    const q10 = document.getElementById('q10').value;
+    const q11 = document.getElementById('q11').value;
+    const q3 = document.getElementById('q3').value;
+    const q8 = document.getElementById('q8').value;
+
+    let aiDesc = '';
+    if (ai <= 3) aiDesc = "AI systems like ChatGPT and Perplexity currently have very little data to work with about you. If someone asks an AI to recommend a creative in your niche, you are unlikely to appear. This is the most urgent thing to address.";
+    else if (ai <= 6) aiDesc = "You have some digital footprint, but it's not structured in a way that AI systems can easily understand or reference. A few targeted changes could significantly improve how you appear in AI-powered search.";
+    else aiDesc = "You're reasonably well set up for AI discoverability. Your online presence gives AI systems enough to work with — but there are still gaps that could be closing opportunities.";
+
+    let visDesc = '';
+    if (vis <= 3) visDesc = "Your visibility is low. The right people — brands, agencies, creative directors — are not finding you through search or discovery. Most of your work is likely coming through people who already know you personally.";
+    else if (vis <= 6) visDesc = "Your visibility is moderate. You're findable by people who look specifically for you, but you're not surfacing in broader discovery — which means you're missing inbound opportunities.";
+    else visDesc = "Your visibility is solid. You have a real presence in search and discovery channels. The focus now should be on making sure what people find accurately represents the work you want to be hired for.";
+
+    return { aiDesc, visDesc };
+  }
+
+  function getBlockers(ai, vis) {
+    const blockers = [];
+    const q3 = document.getElementById('q3').value;
+    const q3b = document.getElementById('q3b')?.value || '';
+    const q6 = document.getElementById('q6').value;
+    const q6b = document.getElementById('q6b')?.value || '';
+    const q9 = document.getElementById('q9').value;
+    const q10 = document.getElementById('q10').value;
+    const q11 = document.getElementById('q11').value;
+    const q7 = document.getElementById('q7').value;
+
+    if (q3 === 'no' || q3 === 'yes_social') blockers.push({ title: "No indexable portfolio online", body: "Without a website or page that search engines and AI systems can crawl, you are essentially invisible to anyone not already following you on social media." });
+    if (q3b === 'difficult' || q3b === 'some_effort') blockers.push({ title: "Hiring friction on your site", body: "If it takes effort to find your rates or contact info, potential clients will move on. Every extra click you require is a client you may be losing." });
+    if (q6 === 'nothing' || q6 === 'never_checked' || q6 === 'other_person') blockers.push({ title: "Weak Google name presence", body: "When clients research you before booking, the first thing they do is Google your name. If you don't control that result, you lose credibility before the conversation starts." });
+    if (q6b === 'no' || q6b === 'unsure') blockers.push({ title: "Not ranking for your niche + location", body: "The most valuable search terms for a creative are their niche and city combined. If you don't appear for these, you're invisible to clients actively looking to hire." });
+    if (q11 === 'none' || q11 === 'bio_only') blockers.push({ title: "No external content about you", body: "AI systems build their understanding of who you are from written content across the web — not just your own profiles. With no press features, interviews, or mentions, they have very little to work with." });
+    if (q10 === 'no') blockers.push({ title: "Inconsistent name across platforms", body: "AI systems cross-reference your name across platforms to verify who you are. Using different names or handles creates confusion and reduces your discoverability significantly." });
+    if (q7 === 'none') blockers.push({ title: "Not listed on any directories", body: "Industry directories are trusted data sources that AI systems pull from. Being absent from them means missing a key signal that you exist and are active in your field." });
+
+    return blockers.slice(0, 4);
+  }
+
+  function getQuickWin(ai, vis) {
+    const q6 = document.getElementById('q6').value;
+    const q11 = document.getElementById('q11').value;
+    const q3 = document.getElementById('q3').value;
+
+    if (q6 === 'nothing' || q6 === 'never_checked') return { title: "Google yourself right now.", body: "Open a private browser and search your full name. Then search your niche + your city. Screenshot what you see. This is your baseline — and it tells you exactly what a client sees when they research you." };
+    if (q11 === 'none') return { title: "Get your name mentioned somewhere external this week.", body: "Write a guest post, ask to be featured in a creative's newsletter, or request a testimonial that gets published somewhere other than your own platforms. One external mention starts the chain." };
+    if (q3 === 'no') return { title: "Set up a single-page portfolio this week.", body: "Even a free site on Squarespace or a Linktree with your best 5 images, a short bio, and your contact info is infinitely better than nothing. It gives AI systems something to index." };
+    return { title: "Audit your name consistency across platforms.", body: "Check that your full professional name appears the same way on Instagram, LinkedIn, your website, and any directories. This is the simplest signal you can send to AI systems to confirm your identity." };
+  }
+
+  function getStanding(ai, vis) {
+    const total = ai + vis;
+    if (total <= 8) return { title: "At risk — act now.", body: "Your digital presence is not set up for the way talent is being discovered in 2026. AI systems and search engines have very little data about you, which means you're dependent entirely on people you already know. This is fixable — but it requires deliberate action." };
+    if (total <= 14) return { title: "Functional — but leaving opportunities on the table.", body: "You have a foundation, but there are clear gaps that are costing you inbound opportunities. The good news: the fixes are specific and actionable. With targeted changes, your discoverability could improve significantly within 30 days." };
+    return { title: "Solid — now it's about precision.", body: "You're more visible than most creatives in your field. The question now is whether what people find when they discover you is accurate, compelling, and easy to act on. Focus on quality over quantity." };
+  }
+
+  function showContactStep() {
+    document.querySelector(`[data-step="${current}"]`).classList.remove('active');
+    document.querySelector('[data-step="contact"]').classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function goBackFromContact() {
+    document.querySelector('[data-step="contact"]').classList.remove('active');
+    document.querySelector(`[data-step="${current}"]`).classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // CONFIGURE: paste your Google Apps Script Web App URL here after deploying
+  const SHEETS_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbzc4PyGyIwZEsyUGWGmbmyEn-IaWBMon89G-s6svnU6hAwxu7JGwA4gMVjIobPzmoq9/exec';
+
+  async function logToSheets(formData, scores) {
+    if (!SHEETS_WEBHOOK_URL || SHEETS_WEBHOOK_URL === 'YOUR_APPS_SCRIPT_URL_HERE') return;
+    try {
+      await fetch(SHEETS_WEBHOOK_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          niche: formData.q1,
+          website: formData.q3_url || formData.q3,
+          instagram_bio: formData.q5,
+          ai_score: scores.ai,
+          vis_score: scores.vis,
+          total_score: scores.ai + scores.vis,
+          timestamp: new Date().toISOString(),
+          platforms: (formData.platforms || []).join(', ')
+        })
+      });
+    } catch(e) {
+      console.warn('Sheet log failed silently:', e);
+    }
+  }
+
+  async function scoreWithClaude(formData) {
+    const prompt = `You are an expert in digital discoverability for fashion creatives. Score this creative's digital presence.
+
+CREATIVE PROFILE:
+- Niche: ${formData.q1} — ${formData.q1b}
+- Ideal client: ${formData.q2}
+- How clients find them: ${formData.q2b}
+- Website: ${formData.q3} ${formData.q3_url ? '(' + formData.q3_url + ')' : ''}
+- Site navigability: ${formData.q3b}
+- Active platforms: ${(formData.platforms||[]).join(', ')}
+- Instagram bio: "${formData.q5}"
+- Google name search result: ${formData.q6}
+- Google niche+location result: ${formData.q6b}
+- Directory listings: ${formData.q7}
+- Main discovery channel: ${formData.q8}
+- AI search self-test: ${formData.q9}
+- Name consistency: ${formData.q10}
+- External written content: ${formData.q11}
+
+Return ONLY valid JSON, no markdown, no explanation:
+{
+  "ai_score": <integer 1-10>,
+  "ai_description": "<2 sentences specific to their situation>",
+  "vis_score": <integer 1-10>,
+  "vis_description": "<2 sentences specific to their situation>",
+  "blockers": [
+    {"title": "<specific blocker>", "body": "<1-2 sentences why this matters for them>"},
+    {"title": "<specific blocker>", "body": "<1-2 sentences>"},
+    {"title": "<specific blocker>", "body": "<1-2 sentences>"}
+  ],
+  "quick_win": {"title": "<one specific action>", "body": "<exactly what to do, 2 sentences>"},
+  "standing": {"title": "<their overall standing label>", "body": "<2-3 sentences honest assessment>"}
+}`;
+
+    const response = await fetch('https://booked-proxy.boldcapetown.workers.dev/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    if (!response.ok) throw new Error('Proxy error');
+    const data = await response.json();
+    const text = data.choices[0].message.content.replace(/```json|```/g, '').trim();
+    return JSON.parse(text);
+  }
+
+  async function submitForm() {
+    // Validate contact
+    const name = document.getElementById('contact_name')?.value?.trim() || '';
+    const email = document.getElementById('contact_email')?.value?.trim() || '';
+    if (!name || !email || !email.includes('@')) {
+      alert('Please enter your name and a valid email to see your scores.');
+      return;
+    }
+
+    document.querySelector('[data-step="contact"]').classList.remove('active');
+    document.getElementById('auditForm').style.display = 'none';
+    document.getElementById('progressWrap').style.display = 'none';
+    document.getElementById('loading').classList.add('show');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    // Collect all form data
+    const formData = {
+      name, email,
+      q1: document.getElementById('q1')?.value || '',
+      q1b: document.getElementById('q1b')?.value || '',
+      q2: document.getElementById('q2')?.value || '',
+      q2b: document.getElementById('q2b')?.value || '',
+      q3: document.getElementById('q3')?.value || '',
+      q3_url: document.getElementById('q3_url')?.value || '',
+      q3b: document.getElementById('q3b')?.value || '',
+      platforms: Array.from(document.querySelectorAll('#platforms input:checked')).map(cb => cb.value),
+      q5: document.getElementById('q5')?.value || '',
+      q6: document.getElementById('q6')?.value || '',
+      q6b: document.getElementById('q6b')?.value || '',
+      q7: document.getElementById('q7')?.value || '',
+      q8: document.getElementById('q8')?.value || '',
+      q9: document.getElementById('q9')?.value || '',
+      q10: document.getElementById('q10')?.value || '',
+      q11: document.getElementById('q11')?.value || ''
+    };
+
+    let result;
+    try {
+      result = await scoreWithClaude(formData);
+      // Log to Sheets regardless of score source
+      await logToSheets(formData, { ai: result.ai_score, vis: result.vis_score });
+    } catch (err) {
+      console.error('Claude scoring error:', err);
+      // Fallback to local scoring
+      const { ai: fAi, vis: fVis } = calcScores();
+      result = {
+        ai_score: fAi,
+        ai_description: 'Baseline assessment — AI analysis temporarily unavailable.',
+        vis_score: fVis,
+        vis_description: 'Baseline assessment — AI analysis temporarily unavailable.',
+        blockers: getBlockers(fAi, fVis),
+        quick_win: getQuickWin(fAi, fVis),
+        standing: getStanding(fAi, fVis)
+      };
+      // Still log the fallback submission
+      await logToSheets(formData, { ai: fAi, vis: fVis });
+    }
+
+    document.getElementById('loading').classList.remove('show');
+
+    const ai = result.ai_score;
+    const vis = result.vis_score;
+    const total = ai + vis;
+    const aiDesc = result.ai_description;
+    const visDesc = result.vis_description;
+    const blockers = result.blockers || [];
+    const quickWin = result.quick_win || { title: '', body: '' };
+    const standing = result.standing || { title: '', body: '' };
+
+      // Scores
+      setTimeout(() => {
+        document.getElementById('num-ai').textContent = ai;
+        document.getElementById('num-ai').classList.add('reveal');
+        document.getElementById('card-ai').classList.add('reveal');
+        document.getElementById('desc-ai').textContent = aiDesc;
+        document.getElementById('desc-ai').classList.add('reveal');
+      }, 200);
+
+      setTimeout(() => {
+        document.getElementById('num-vis').textContent = vis;
+        document.getElementById('num-vis').classList.add('reveal');
+        document.getElementById('card-vis').classList.add('reveal');
+        document.getElementById('desc-vis').textContent = visDesc;
+        document.getElementById('desc-vis').classList.add('reveal');
+      }, 500);
+
+      setTimeout(() => {
+        document.getElementById('num-total').textContent = total + ' / 20';
+        document.getElementById('num-total').classList.add('reveal');
+      }, 800);
+
+      // Blockers
+      const blockerList = document.getElementById('blockers');
+      blockers.forEach((b, i) => {
+        const li = document.createElement('li');
+        li.className = 'insight-item';
+        li.innerHTML = `<span class="insight-num">0${i+1}</span><div class="insight-body"><h4>${b.title}</h4><p>${b.body}</p></div>`;
+        blockerList.appendChild(li);
+        setTimeout(() => li.classList.add('reveal'), 1000 + (i * 150));
+      });
+
+      // Quick win
+      setTimeout(() => {
+        document.getElementById('quickWinTitle').textContent = quickWin.title;
+        document.getElementById('quickWinBody').textContent = quickWin.body;
+        document.getElementById('quickWin').classList.add('reveal');
+      }, 1600);
+
+      // Standing
+      setTimeout(() => {
+        document.getElementById('standingTitle').textContent = standing.title;
+        document.getElementById('standingBody').textContent = standing.body;
+        document.getElementById('standing').classList.add('reveal');
+      }, 1800);
+
+    document.getElementById('preview').classList.add('show');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+
+  function autofill() {
+    // Step 1
+    const q1 = document.getElementById('q1');
+    if (q1) q1.value = 'Photographer';
+
+    const q1b = document.getElementById('q1b');
+    if (q1b) q1b.value = 'Editorial lookbooks for luxury fashion brands';
+
+    const q2 = document.getElementById('q2');
+    if (q2) q2.value = 'Luxury fashion brands, editorial magazines, emerging designers';
+
+    const q2b = document.getElementById('q2b');
+    if (q2b) q2b.value = 'instagram';
+
+    // Step 2
+    const q3 = document.getElementById('q3');
+    if (q3) { q3.value = 'yes_custom'; toggleUrlField(); }
+
+    const q3_url = document.getElementById('q3_url');
+    if (q3_url) q3_url.value = 'https://janedoe.com';
+
+    const q3b = document.getElementById('q3b');
+    if (q3b) q3b.value = 'some_effort';
+
+    // Platforms
+    const platforms = document.querySelectorAll('#platforms input[type="checkbox"]');
+    platforms.forEach((cb, i) => { if (i < 2) cb.checked = true; });
+
+    const q5 = document.getElementById('q5');
+    if (q5) q5.value = 'Cape Town photographer · Editorial & Commercial · DM to book';
+
+    // Step 3
+    const q6 = document.getElementById('q6');
+    if (q6) q6.value = 'page1';
+
+    const q6b = document.getElementById('q6b');
+    if (q6b) q6b.value = 'yes_somewhere';
+
+    const q7 = document.getElementById('q7');
+    if (q7) q7.value = 'one';
+
+    const q8 = document.getElementById('q8');
+    if (q8) q8.value = 'instagram';
+
+    // Step 4
+    const q9 = document.getElementById('q9');
+    if (q9) q9.value = 'yes_not_found';
+
+    const q10 = document.getElementById('q10');
+    if (q10) q10.value = 'mostly';
+
+    const q11 = document.getElementById('q11');
+    if (q11) q11.value = 'bio_only';
+
+    // Jump to last step then to contact step
+    while (current < totalSteps) goNext();
+    setTimeout(() => {
+      showContactStep();
+      document.getElementById('contact_name').value = 'Test User';
+      document.getElementById('contact_email').value = 'test@example.com';
+      setTimeout(() => submitForm(), 200);
+    }, 300);
+  }
+
+  function handlePayment() {
+    window.open('https://pay.yoco.com/r/2VyNNg', '_blank');
+  }
+
+  updateProgress();
+</script>
+
+
+
+</body>
+</html>
