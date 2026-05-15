@@ -9,26 +9,24 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
 <style>
   :root {
-    --gold:               #C8A96E;
-    --gold-light:         #e2c98a;
-    --gold-dim:           rgba(200,169,110,0.15);
-    --gold-border:        rgba(200,169,110,0.12);
-    --gold-border-hover:  rgba(200,169,110,0.35);
-    --gold-fill:          rgba(200,169,110,0.04);
-    --gold-subtle:        rgba(200,169,110,0.08);
-    --violet:             #a98fe0;
-    --violet-fill:        rgba(169,143,224,0.08);
-    --violet-border:      rgba(169,143,224,0.22);
-    --void:               #0e0a1a;
-    --card:               #0e1020;
-    --card-2:             #11142a;
-    --off-white:          #f0ede8;
-    --subtext:            #9a9a9a;
-    --red:                #c94040;
-    --red-fill:           rgba(201,64,64,0.10);
-    --red-border:         rgba(201,64,64,0.30);
-    --font-display:       'Cormorant Garamond', Georgia, serif;
-    --font-body:          'Helvetica Neue', Helvetica, sans-serif;
+    --gold:          #C8A96E;
+    --gold-light:    #e2c98a;
+    --gold-dim:      rgba(200,169,110,0.15);
+    --gold-border:   rgba(200,169,110,0.12);
+    --gold-borderhv: rgba(200,169,110,0.35);
+    --gold-fill:     rgba(200,169,110,0.04);
+    --gold-subtle:   rgba(200,169,110,0.08);
+    --violet:        #a98fe0;
+    --void:          #0e0a1a;
+    --card:          #0e1020;
+    --card2:         #11142a;
+    --off-white:     #f0ede8;
+    --subtext:       #9a9a9a;
+    --red:           #c94040;
+    --red-fill:      rgba(201,64,64,0.10);
+    --red-border:    rgba(201,64,64,0.30);
+    --fd:            'Cormorant Garamond', Georgia, serif;
+    --fb:            'Helvetica Neue', Helvetica, sans-serif;
   }
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -37,10 +35,11 @@
   body {
     background: var(--void);
     color: var(--off-white);
-    font-family: var(--font-body);
+    font-family: var(--fb);
     font-weight: 300;
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
   }
 
   body::before {
@@ -54,99 +53,163 @@
     z-index: 0;
   }
 
-  ::selection { background: rgba(200,169,110,0.2); color: var(--off-white); }
+  ::selection { background: rgba(200,169,110,0.2); }
 
-  /* SLIDES */
+  /* ── SLIDE BASE ── */
   .slide {
-    min-height: 100vh;
+    min-height: 100svh;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    padding: 100px 110px;
+    padding: 80px 24px 60px;
     border-bottom: 1px solid var(--gold-border);
     position: relative;
     z-index: 1;
   }
 
+  @media (min-width: 640px) {
+    .slide { padding: 100px 48px 80px; }
+  }
+
+  @media (min-width: 1024px) {
+    .slide { padding: 110px 110px 90px; }
+  }
+
+  /* ── LOGO + SLIDE NUM ── */
+  .deck-logo {
+    position: absolute;
+    top: 28px;
+    left: 24px;
+    font-family: var(--fd);
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+
+  @media (min-width: 640px) {
+    .deck-logo { top: 36px; left: 48px; font-size: 18px; }
+  }
+
+  @media (min-width: 1024px) {
+    .deck-logo { top: 44px; left: 110px; }
+  }
+
   .slide-num {
     position: absolute;
-    top: 44px;
-    right: 110px;
-    font-size: 11px;
+    top: 32px;
+    right: 24px;
+    font-size: 10px;
     letter-spacing: 0.25em;
     text-transform: uppercase;
     color: var(--subtext);
-    font-family: var(--font-body);
   }
 
+  @media (min-width: 640px) {
+    .slide-num { top: 40px; right: 48px; }
+  }
+
+  @media (min-width: 1024px) {
+    .slide-num { top: 44px; right: 110px; }
+  }
+
+  /* ── LABEL ── */
   .slide-label {
-    font-size: 11px;
+    font-size: 10px;
     letter-spacing: 0.3em;
     text-transform: uppercase;
     color: var(--gold);
-    margin-bottom: 28px;
+    margin-bottom: 20px;
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
   }
 
   .slide-label::before {
     content: '';
     display: block;
-    width: 28px;
+    width: 20px;
     height: 1px;
     background: var(--gold);
     opacity: 0.6;
+    flex-shrink: 0;
   }
 
+  @media (min-width: 640px) {
+    .slide-label { font-size: 11px; margin-bottom: 28px; }
+    .slide-label::before { width: 28px; }
+  }
+
+  /* ── HEADINGS ── */
   h1 {
-    font-family: var(--font-display);
-    font-size: clamp(56px, 8vw, 100px);
+    font-family: var(--fd);
+    font-size: clamp(44px, 10vw, 100px);
     font-weight: 300;
     line-height: 0.95;
     letter-spacing: -0.01em;
     color: var(--off-white);
-    margin-bottom: 36px;
+    margin-bottom: 24px;
   }
 
   h1 em { font-style: italic; color: var(--gold); }
 
   h2 {
-    font-family: var(--font-display);
-    font-size: clamp(36px, 5vw, 62px);
+    font-family: var(--fd);
+    font-size: clamp(32px, 7vw, 62px);
     font-weight: 300;
     line-height: 1.05;
     letter-spacing: -0.01em;
     color: var(--off-white);
-    margin-bottom: 28px;
+    margin-bottom: 20px;
   }
 
   h2 em { font-style: italic; color: var(--violet); }
 
-  p.body {
-    font-size: 16px;
+  @media (min-width: 640px) {
+    h1 { margin-bottom: 32px; }
+    h2 { margin-bottom: 28px; }
+  }
+
+  p.body-text {
+    font-size: 15px;
     line-height: 1.75;
     color: var(--subtext);
-    max-width: 600px;
     font-weight: 300;
   }
 
+  @media (min-width: 640px) { p.body-text { font-size: 16px; } }
+
   .gold-line {
-    width: 40px;
+    width: 32px;
     height: 1px;
     background: var(--gold);
     opacity: 0.5;
-    margin: 28px 0;
+    margin: 24px 0;
   }
 
-  /* COVER */
+  /* ── COVER META ── */
   .cover-meta {
     display: flex;
-    gap: 48px;
-    margin-top: 52px;
-    padding-top: 40px;
+    flex-direction: column;
+    gap: 20px;
+    margin-top: 36px;
+    padding-top: 28px;
     border-top: 1px solid var(--gold-border);
-    flex-wrap: wrap;
+  }
+
+  @media (min-width: 640px) {
+    .cover-meta {
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 32px;
+      margin-top: 48px;
+      padding-top: 36px;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .cover-meta { gap: 48px; margin-top: 52px; padding-top: 40px; }
   }
 
   .meta-item span:first-child {
@@ -168,117 +231,152 @@
     display: inline-flex;
     align-items: baseline;
     gap: 8px;
-    padding: 10px 20px;
+    padding: 8px 16px;
     border: 1px solid var(--red-border);
     background: var(--red-fill);
   }
 
-  .score-badge .num { font-family: Georgia, serif; font-size: 48px; line-height: 1; color: var(--red); font-weight: 400; }
-  .score-badge .denom { font-family: Georgia, serif; font-size: 22px; color: rgba(240,237,232,0.3); font-weight: 400; }
-
-  /* SCORE SLIDE */
-  .score-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 80px;
-    align-items: center;
-    margin-top: 20px;
-    overflow: visible;
+  .score-badge .num {
+    font-family: Georgia, serif;
+    font-size: 40px;
+    line-height: 1;
+    color: var(--red);
+    font-weight: 400;
   }
 
-  .score-number-row {
+  .score-badge .denom {
+    font-family: Georgia, serif;
+    font-size: 18px;
+    color: rgba(240,237,232,0.3);
+    font-weight: 400;
+  }
+
+  /* ── SCORE SLIDE ── */
+  .score-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    margin-top: 16px;
+  }
+
+  @media (min-width: 900px) {
+    .score-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: center;
+    }
+  }
+
+  .big-num-row {
     display: flex;
     flex-direction: row;
-    flex-wrap: nowrap;
     align-items: baseline;
     gap: 12px;
     line-height: 1;
-    white-space: nowrap;
   }
 
   .big-score {
-    font-family: var(--font-display);
-    font-size: 180px;
+    font-family: Georgia, serif;
+    font-size: clamp(100px, 20vw, 180px);
     line-height: 1;
-    letter-spacing: -0.04em;
     color: var(--red);
-    font-weight: 300;
-    display: inline-block;
+    font-weight: 400;
   }
 
   .big-denom {
-    font-family: var(--font-display);
-    font-size: 52px;
-    color: rgba(240,237,232,0.2);
-    font-weight: 300;
-    display: inline-block;
+    font-family: Georgia, serif;
+    font-size: clamp(32px, 7vw, 56px);
+    color: rgba(240,237,232,0.18);
+    font-weight: 400;
   }
 
   .score-tag {
-    font-size: 11px;
+    font-size: 10px;
     letter-spacing: 0.2em;
     text-transform: uppercase;
     color: var(--subtext);
-    margin-top: 10px;
+    margin-top: 8px;
   }
 
   .score-note {
     background: var(--red-fill);
     border: 1px solid var(--red-border);
     border-left: 2px solid var(--red);
-    padding: 22px 26px;
-    margin-top: 24px;
+    padding: 18px 20px;
+    margin-top: 20px;
   }
 
-  .score-note p { font-size: 15px; color: rgba(240,237,232,0.7); max-width: 100%; line-height: 1.65; }
+  .score-note p {
+    font-size: 14px;
+    color: rgba(240,237,232,0.7);
+    line-height: 1.65;
+  }
+
+  @media (min-width: 640px) {
+    .score-note { padding: 22px 26px; }
+    .score-note p { font-size: 15px; }
+  }
 
   .range-list { display: flex; flex-direction: column; }
+
   .range-row {
     display: grid;
-    grid-template-columns: 220px 1fr;
+    grid-template-columns: 1fr 80px;
     align-items: center;
-    gap: 16px;
-    padding: 12px 0;
+    gap: 12px;
+    padding: 10px 0;
     border-bottom: 1px solid rgba(200,169,110,0.06);
   }
+
+  @media (min-width: 480px) {
+    .range-row { grid-template-columns: 200px 1fr; gap: 16px; }
+  }
+
   .range-row:last-child { border: none; }
-  .range-label { font-size: 11px; letter-spacing: 0.08em; color: rgba(154,154,154,0.5); font-family: var(--font-body); }
+  .range-label { font-size: 11px; letter-spacing: 0.06em; color: rgba(154,154,154,0.45); }
   .range-label.active { color: var(--red); }
   .range-bar-wrap { height: 1px; background: rgba(200,169,110,0.08); }
   .range-bar { height: 1px; background: rgba(200,169,110,0.2); }
   .range-bar.active { background: var(--red); }
 
-  /* ACCOUNT MAP */
+  /* ── ACCOUNT GRID ── */
   .account-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: 1fr 1fr;
     gap: 1px;
-    margin-top: 24px;
+    margin-top: 20px;
     background: var(--gold-border);
+  }
+
+  @media (min-width: 900px) {
+    .account-grid { grid-template-columns: repeat(4, 1fr); }
   }
 
   .account-card {
     background: var(--card);
-    padding: 28px 24px;
-    transition: background 0.2s;
+    padding: 20px 18px;
   }
 
-  .account-card:hover { background: var(--card-2); }
+  @media (min-width: 640px) {
+    .account-card { padding: 24px 20px; }
+  }
 
   .handle {
-    font-size: 10px;
-    letter-spacing: 0.12em;
+    font-size: 9px;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
     color: var(--gold);
-    margin-bottom: 14px;
+    margin-bottom: 10px;
     display: block;
-    font-family: var(--font-body);
+    word-break: break-all;
   }
 
+  @media (min-width: 640px) { .handle { font-size: 10px; } }
+
   .followers {
-    font-family: var(--font-display);
-    font-size: 40px;
-    font-weight: 300;
+    font-family: Georgia, serif;
+    font-size: clamp(28px, 5vw, 40px);
     color: var(--off-white);
     line-height: 1;
     margin-bottom: 6px;
@@ -287,140 +385,177 @@
   .followers.low { color: var(--red); }
 
   .account-purpose {
-    font-size: 12px;
+    font-size: 11px;
     color: var(--subtext);
-    line-height: 1.55;
-    margin-bottom: 14px;
+    line-height: 1.5;
+    margin-bottom: 12px;
   }
 
+  @media (min-width: 640px) { .account-purpose { font-size: 12px; } }
+
   .flag {
-    font-size: 10px;
-    letter-spacing: 0.1em;
+    font-size: 9px;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
-    padding: 3px 10px;
+    padding: 3px 8px;
     display: inline-block;
-    font-family: var(--font-body);
   }
 
   .flag-warn { border: 1px solid var(--red-border); color: var(--red); background: var(--red-fill); }
   .flag-dead { border: 1px solid rgba(154,154,154,0.2); color: var(--subtext); }
-  .flag-ok   { border: 1px solid rgba(200,169,110,0.3); color: var(--gold); }
 
   .account-total {
-    margin-top: 16px;
-    padding: 20px 24px;
+    margin-top: 12px;
+    padding: 16px 18px;
     border: 1px solid var(--gold-border);
     background: var(--gold-fill);
     display: flex;
-    align-items: baseline;
-    gap: 20px;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  @media (min-width: 640px) {
+    .account-total {
+      flex-direction: row;
+      align-items: baseline;
+      gap: 20px;
+      padding: 18px 20px;
+    }
   }
 
   .total-num {
-    font-family: var(--font-display);
-    font-size: 34px;
-    font-weight: 300;
+    font-family: Georgia, serif;
+    font-size: 28px;
     color: var(--gold);
     white-space: nowrap;
+    font-weight: 400;
   }
 
-  .account-total p { font-size: 13px; color: var(--subtext); max-width: 100%; line-height: 1.6; }
+  @media (min-width: 640px) { .total-num { font-size: 32px; } }
 
-  /* DIMENSIONS */
-  .dim-list { display: flex; flex-direction: column; max-width: 820px; margin-top: 8px; }
+  .account-total p { font-size: 12px; color: var(--subtext); line-height: 1.6; }
+
+  @media (min-width: 640px) { .account-total p { font-size: 13px; } }
+
+  /* ── DIMENSIONS ── */
+  .dim-list { display: flex; flex-direction: column; margin-top: 8px; }
 
   .dim-row {
     display: grid;
-    grid-template-columns: 250px 1fr 80px;
+    grid-template-columns: 1fr 48px;
     align-items: center;
-    gap: 28px;
-    padding: 20px 0;
+    gap: 12px;
+    padding: 14px 0;
     border-bottom: 1px solid var(--gold-border);
+  }
+
+  @media (min-width: 640px) {
+    .dim-row {
+      grid-template-columns: 200px 1fr 64px;
+      gap: 20px;
+      padding: 18px 0;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .dim-row { grid-template-columns: 250px 1fr 80px; gap: 28px; }
   }
 
   .dim-row:last-child { border: none; }
 
   .dim-name {
-    font-size: 13px;
-    letter-spacing: 0.05em;
+    font-size: 12px;
+    letter-spacing: 0.03em;
     color: var(--off-white);
     font-weight: 300;
   }
 
-  .dim-bar-wrap { height: 1px; background: rgba(200,169,110,0.1); }
+  @media (min-width: 640px) { .dim-name { font-size: 13px; } }
+
+  .dim-bar-wrap { height: 1px; background: rgba(200,169,110,0.1); display: none; }
+  @media (min-width: 640px) { .dim-bar-wrap { display: block; } }
+
   .dim-bar { height: 1px; }
   .dim-bar.red { background: var(--red); }
   .dim-bar.gold { background: var(--gold); }
-  .dim-bar.none { background: transparent; }
 
   .dim-score {
-    font-family: var(--font-display);
-    font-size: 18px;
-    font-weight: 300;
+    font-family: Georgia, serif;
+    font-size: 14px;
     color: var(--subtext);
     text-align: right;
+    white-space: nowrap;
   }
 
   .dim-score.red { color: var(--red); }
 
-  /* BLOCKERS */
-  .blocker-list { display: flex; flex-direction: column; max-width: 820px; margin-top: 8px; }
+  /* ── BLOCKERS ── */
+  .blocker-list { display: flex; flex-direction: column; margin-top: 8px; }
 
   .blocker {
     display: grid;
-    grid-template-columns: 52px 1fr;
-    gap: 20px;
+    grid-template-columns: 36px 1fr;
+    gap: 16px;
     align-items: start;
-    padding: 28px 0;
+    padding: 20px 0;
     border-bottom: 1px solid var(--gold-border);
+  }
+
+  @media (min-width: 640px) {
+    .blocker { grid-template-columns: 48px 1fr; gap: 20px; padding: 24px 0; }
   }
 
   .blocker:last-child { border: none; padding-bottom: 0; }
 
   .blocker-num {
-    font-family: var(--font-display);
-    font-size: 36px;
-    font-weight: 300;
+    font-family: Georgia, serif;
+    font-size: 28px;
+    font-style: italic;
     color: var(--gold);
     line-height: 1;
-    font-style: italic;
+    font-weight: 400;
   }
+
+  @media (min-width: 640px) { .blocker-num { font-size: 34px; } }
 
   .blocker h4 {
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 400;
     color: var(--off-white);
-    margin-bottom: 8px;
+    margin-bottom: 6px;
     letter-spacing: 0.02em;
+    line-height: 1.4;
   }
+
+  @media (min-width: 640px) { .blocker h4 { font-size: 14px; } }
 
   .blocker p {
-    font-size: 14px;
+    font-size: 13px;
     color: var(--subtext);
     line-height: 1.7;
-    max-width: 100%;
   }
 
-  /* OFFER */
+  /* ── OFFER ── */
   .offer-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: 1fr;
     gap: 1px;
-    margin-top: 32px;
+    margin-top: 24px;
     background: var(--gold-border);
   }
 
+  @media (min-width: 640px) { .offer-grid { grid-template-columns: repeat(3, 1fr); } }
+
   .offer-card {
     background: var(--card);
-    padding: 36px 30px;
-    transition: background 0.2s;
+    padding: 28px 24px;
   }
 
-  .offer-card:hover { background: var(--card-2); }
+  @media (min-width: 640px) { .offer-card { padding: 32px 28px; } }
 
   .offer-card.featured {
     background: var(--gold-subtle);
-    border: 1px solid var(--gold-border-hover);
+    border: 1px solid var(--gold-borderhv);
   }
 
   .otag {
@@ -428,16 +563,16 @@
     letter-spacing: 0.25em;
     text-transform: uppercase;
     color: var(--gold);
-    margin-bottom: 16px;
+    margin-bottom: 12px;
     display: block;
   }
 
   .offer-card h4 {
-    font-family: var(--font-display);
-    font-size: 32px;
+    font-family: var(--fd);
+    font-size: clamp(24px, 4vw, 32px);
     font-weight: 300;
     color: var(--off-white);
-    margin-bottom: 12px;
+    margin-bottom: 10px;
     line-height: 1.1;
   }
 
@@ -445,77 +580,96 @@
     font-size: 13px;
     color: var(--subtext);
     line-height: 1.7;
-    max-width: 100%;
   }
 
   .offer-price {
-    font-size: 12px;
-    letter-spacing: 0.1em;
+    font-size: 11px;
+    letter-spacing: 0.08em;
     color: var(--gold);
-    margin-top: 24px;
-    padding-top: 20px;
+    margin-top: 20px;
+    padding-top: 16px;
     border-top: 1px solid var(--gold-border);
   }
 
-  /* PLAN */
-  .plan-list { display: flex; flex-direction: column; max-width: 780px; margin-top: 8px; }
+  /* ── PLAN ── */
+  .plan-list { display: flex; flex-direction: column; margin-top: 8px; }
 
   .plan-item {
     display: grid;
-    grid-template-columns: 44px 1fr;
-    gap: 20px;
-    padding: 18px 0;
+    grid-template-columns: 36px 1fr;
+    gap: 16px;
+    padding: 16px 0;
     border-bottom: 1px solid var(--gold-border);
     align-items: start;
+  }
+
+  @media (min-width: 640px) {
+    .plan-item { grid-template-columns: 44px 1fr; gap: 20px; padding: 18px 0; }
   }
 
   .plan-item:last-child { border: none; }
 
   .plan-num {
-    font-family: var(--font-display);
-    font-size: 22px;
-    font-weight: 300;
-    color: var(--gold);
+    font-family: Georgia, serif;
+    font-size: 18px;
     font-style: italic;
-    padding-top: 1px;
+    color: var(--gold);
+    padding-top: 2px;
+    font-weight: 400;
   }
 
+  @media (min-width: 640px) { .plan-num { font-size: 22px; } }
+
   .plan-item p {
-    font-size: 14px;
+    font-size: 13px;
     color: var(--off-white);
     line-height: 1.65;
-    max-width: 100%;
     margin-bottom: 5px;
     font-weight: 300;
   }
 
+  @media (min-width: 640px) { .plan-item p { font-size: 14px; } }
+
   .plan-item small {
-    font-size: 12px;
+    font-size: 11px;
     color: var(--subtext);
     font-style: italic;
+    line-height: 1.5;
+    display: block;
   }
 
-  /* CLOSE */
+  @media (min-width: 640px) { .plan-item small { font-size: 12px; } }
+
+  /* ── CLOSE ── */
   .pullquote {
-    font-family: var(--font-display);
-    font-size: clamp(22px, 3vw, 38px);
+    font-family: var(--fd);
+    font-size: clamp(18px, 4vw, 36px);
     font-weight: 300;
     line-height: 1.4;
     color: var(--off-white);
-    max-width: 800px;
     font-style: italic;
-    margin-bottom: 36px;
+    margin-bottom: 28px;
   }
 
   .pullquote em { color: var(--gold); font-style: normal; }
 
   .closing-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 60px;
-    margin-top: 44px;
-    padding-top: 44px;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    margin-top: 36px;
+    padding-top: 36px;
     border-top: 1px solid var(--gold-border);
+  }
+
+  @media (min-width: 760px) {
+    .closing-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      margin-top: 44px;
+      padding-top: 44px;
+    }
   }
 
   .closing-col h3 {
@@ -523,51 +677,55 @@
     letter-spacing: 0.25em;
     text-transform: uppercase;
     color: var(--subtext);
-    margin-bottom: 14px;
+    margin-bottom: 12px;
+    font-weight: 300;
   }
 
-  .closing-col p { font-size: 14px; color: var(--subtext); line-height: 1.75; max-width: 100%; }
+  .closing-col p {
+    font-size: 13px;
+    color: var(--subtext);
+    line-height: 1.75;
+  }
+
+  @media (min-width: 640px) { .closing-col p { font-size: 14px; } }
 
   .cta-block {
-    margin-top: 20px;
-    padding: 28px;
-    border: 1px solid var(--gold-border-hover);
+    margin-top: 16px;
+    padding: 22px 22px;
+    border: 1px solid var(--gold-borderhv);
     background: var(--gold-fill);
   }
 
   .cta-block strong {
     display: block;
-    font-family: var(--font-display);
-    font-size: 24px;
+    font-family: var(--fd);
+    font-size: clamp(18px, 3vw, 24px);
     font-weight: 300;
     color: var(--gold);
     font-style: italic;
     margin-bottom: 10px;
+    line-height: 1.2;
   }
 
-  .cta-block p { font-size: 13px; color: var(--subtext); max-width: 100%; line-height: 1.65; }
-
-  /* BOOKED LOGO — top left */
-  .deck-logo {
-    position: absolute;
-    top: 44px;
-    left: 110px;
-    font-family: var(--font-display);
-    font-size: 18px;
-    font-weight: 600;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--gold);
+  .cta-block p {
+    font-size: 13px;
+    color: var(--subtext);
+    line-height: 1.65;
   }
 
-  /* NAV DOTS */
+  /* ── NAV DOTS ── */
   .nav {
     position: fixed;
-    bottom: 40px;
-    right: 56px;
+    bottom: 28px;
+    right: 20px;
     display: flex;
-    gap: 8px;
+    flex-direction: column;
+    gap: 7px;
     z-index: 100;
+  }
+
+  @media (min-width: 640px) {
+    .nav { bottom: 36px; right: 40px; flex-direction: row; }
   }
 
   .nav-dot {
@@ -575,12 +733,18 @@
     height: 5px;
     border-radius: 50%;
     background: transparent;
-    border: 1px solid rgba(154,154,154,0.35);
+    border: 1px solid rgba(154,154,154,0.3);
     cursor: pointer;
     transition: all 0.25s;
   }
 
   .nav-dot.active { background: var(--gold); border-color: var(--gold); }
+
+  /* ── RANGE BAR hidden on mobile ── */
+  @media (max-width: 479px) {
+    .range-row { grid-template-columns: 1fr; }
+    .range-bar-wrap { display: none; }
+  }
 </style>
 </head>
 <body>
@@ -591,7 +755,7 @@
   <span class="slide-num">01 / 08</span>
   <div class="slide-label">Full Scan Report</div>
   <h1>Fanie Nel<br><em>Official</em></h1>
-  <p class="body">A full discoverability audit of the Fanie Nel / Discovered ecosystem. Every platform. Every search result. Every point of failure.</p>
+  <p class="body-text">A full discoverability audit of the Fanie Nel / Discovered ecosystem. Every platform. Every search result. Every point of failure.</p>
   <div class="cover-meta">
     <div class="meta-item">
       <span>Accounts audited</span>
@@ -599,9 +763,7 @@
     </div>
     <div class="meta-item">
       <span>Overall score</span>
-      <span>
-        <span class="score-badge"><span class="num">5</span><span class="denom"> / 20</span></span>
-      </span>
+      <span><span class="score-badge"><span class="num">5</span><span class="denom">/ 20</span></span></span>
     </div>
     <div class="meta-item">
       <span>Prepared by</span>
@@ -621,9 +783,9 @@
   <div class="slide-label">Overall score</div>
   <div class="score-grid">
     <div>
-      <div style="display:flex;flex-direction:row;align-items:baseline;gap:16px;white-space:nowrap;line-height:1;overflow:visible;">
-        <span style="font-family:Georgia,serif;font-size:clamp(120px,14vw,200px);line-height:1;letter-spacing:-0.03em;color:#c94040;font-weight:400;display:block;">5</span>
-        <span style="font-family:Georgia,serif;font-size:clamp(36px,5vw,60px);color:rgba(240,237,232,0.18);font-weight:400;display:block;">/ 20</span>
+      <div class="big-num-row">
+        <span class="big-score">5</span>
+        <span class="big-denom">/ 20</span>
       </div>
       <div class="score-tag">Scan score — full audit</div>
       <div class="score-note">
@@ -631,7 +793,7 @@
       </div>
     </div>
     <div>
-      <h3 style="font-size:10px;letter-spacing:0.25em;text-transform:uppercase;color:var(--subtext);margin-bottom:20px;font-weight:300">Score range</h3>
+      <h3 style="font-size:10px;letter-spacing:0.25em;text-transform:uppercase;color:var(--subtext);margin-bottom:16px;font-weight:300">Score range</h3>
       <div class="range-list">
         <div class="range-row"><span class="range-label">18–20 — Minor refinements</span><div class="range-bar-wrap"><div class="range-bar" style="width:100%"></div></div></div>
         <div class="range-row"><span class="range-label">14–17 — Solid, clear gaps</span><div class="range-bar-wrap"><div class="range-bar" style="width:75%"></div></div></div>
@@ -643,7 +805,7 @@
   </div>
 </section>
 
-<!-- S3: ACCOUNT MAP -->
+<!-- S3: ACCOUNTS -->
 <section class="slide" id="s3">
   <div class="deck-logo">Booked.</div>
   <span class="slide-num">03 / 08</span>
@@ -671,13 +833,13 @@
     <div class="account-card">
       <span class="handle">@discoveredmanagement</span>
       <div class="followers">1,423</div>
-      <div class="account-purpose">Agency account. 81 posts. No visible link to photographer identity. Operates as a disconnected entity.</div>
+      <div class="account-purpose">Agency account. 81 posts. No visible link to photographer identity. Disconnected entity.</div>
       <span class="flag flag-dead">Disconnected island</span>
     </div>
   </div>
   <div class="account-total">
     <div class="total-num">9,449</div>
-    <p>Combined following across 4 accounts — none with critical mass. Consolidated, this is a credible near-10k presence. Fragmented, none carries enough weight to rank or be recommended. Plus: 2 LinkedIn profiles, both listing defunct companies (FANJAM / FANJAM Concepts), combined 43 followers.</p>
+    <p>Combined following — none with critical mass. Consolidated this is a credible near-10k presence. Fragmented, none carries enough weight to rank or be recommended. Plus: 2 LinkedIn profiles listing defunct companies (FANJAM / FANJAM Concepts), combined 43 followers.</p>
   </div>
 </section>
 
@@ -695,7 +857,7 @@
     </div>
     <div class="dim-row">
       <span class="dim-name">Positioning Clarity</span>
-      <div class="dim-bar-wrap"><div class="dim-bar none" style="width:0%"></div></div>
+      <div class="dim-bar-wrap"><div class="dim-bar" style="width:0%"></div></div>
       <span class="dim-score red">0 / 4</span>
     </div>
     <div class="dim-row">
@@ -710,11 +872,11 @@
     </div>
     <div class="dim-row">
       <span class="dim-name">Platform Coherence</span>
-      <div class="dim-bar-wrap"><div class="dim-bar none" style="width:0%"></div></div>
+      <div class="dim-bar-wrap"><div class="dim-bar" style="width:0%"></div></div>
       <span class="dim-score red">0 / 4</span>
     </div>
   </div>
-  <p style="margin-top:24px;font-size:12px;color:var(--subtext);letter-spacing:0.05em">Two dimensions score zero. The website exists and ranks — the only infrastructure keeping this above a flat zero.</p>
+  <p style="margin-top:20px;font-size:11px;color:var(--subtext);letter-spacing:0.04em;line-height:1.6">Two dimensions score zero. The website exists and ranks — the only infrastructure keeping this above a flat zero.</p>
 </section>
 
 <!-- S5: BLOCKERS -->
@@ -735,7 +897,7 @@
       <div class="blocker-num">2</div>
       <div>
         <h4>LinkedIn indexes him under two defunct companies.</h4>
-        <p>Two profiles — one listing FANJAM Model Management, one listing fanjam concepts. Both near-empty. A gmail address publicly visible on one. European clients who check LinkedIn find an abandoned profile under a company that no longer exists. Discovered Management does not appear on LinkedIn at all.</p>
+        <p>Two profiles — one listing FANJAM Model Management, one listing fanjam concepts. Both near-empty. A gmail address publicly visible. European clients find an abandoned profile under a company that no longer exists. Discovered Management does not appear on LinkedIn at all.</p>
       </div>
     </div>
     <div class="blocker">
@@ -749,14 +911,14 @@
       <div class="blocker-num">4</div>
       <div>
         <h4>The scouting pipeline runs through the weakest account.</h4>
-        <p>@fanieneltestshoots at 325 followers is the first thing aspiring models see before applying to Discovered. Low authority at the entry point signals a low-authority operation — regardless of what the actual work looks like.</p>
+        <p>@fanieneltestshoots at 325 followers is the first thing aspiring models see before applying to Discovered. Low authority at the entry point signals a low-authority operation — regardless of the actual work.</p>
       </div>
     </div>
     <div class="blocker">
       <div class="blocker-num">5</div>
       <div>
         <h4>The strongest positioning signal lives where no one looks.</h4>
-        <p>"Internationally compared to the late Peter Lindbergh" appears on the About page and in a Google snippet. It does not appear in any Instagram bio, any LinkedIn profile, or anywhere a casting director encounters it on first contact.</p>
+        <p>"Internationally compared to the late Peter Lindbergh" appears on the About page and in a Google snippet — not in any Instagram bio, not on LinkedIn, not anywhere a casting director encounters it on first contact.</p>
       </div>
     </div>
   </div>
@@ -771,19 +933,19 @@
   <div class="offer-grid">
     <div class="offer-card">
       <span class="otag">Scan</span>
-      <h4>Full<br>Audit</h4>
+      <h4>Full Audit</h4>
       <p>All 5 dimensions scored. Named blockers. Prioritised 30-day action plan. A brief to act on without further explanation.</p>
       <div class="offer-price">R2,500 — delivered in 48hrs</div>
     </div>
     <div class="offer-card featured">
       <span class="otag">Structure</span>
-      <h4>Infrastructure<br>Rebuild</h4>
+      <h4>Infrastructure Rebuild</h4>
       <p>Account consolidation, positioning architecture, bio rewrites, LinkedIn rebuild, platform coherence across every touchpoint.</p>
       <div class="offer-price">R12,500 – R45,000 — scope dependent</div>
     </div>
     <div class="offer-card">
       <span class="otag">Launch</span>
-      <h4>Full<br>Ecosystem</h4>
+      <h4>Full Ecosystem</h4>
       <p>End-to-end. Positioning, digital infrastructure, AI discoverability, brand coherence. Built to run without you in the room.</p>
       <div class="offer-price">From R65,000</div>
     </div>
@@ -796,7 +958,7 @@
   <span class="slide-num">07 / 08</span>
   <div class="slide-label">Immediate actions</div>
   <h2>30-day<br><em>plan</em></h2>
-  <p class="body" style="margin-bottom:8px;font-size:14px">Doable without a Booked engagement. Ordered by impact.</p>
+  <p class="body-text" style="font-size:13px;margin-bottom:8px">Doable without a Booked engagement. Ordered by impact.</p>
   <div class="plan-list">
     <div class="plan-item">
       <span class="plan-num">01</span>
@@ -809,7 +971,7 @@
       <span class="plan-num">02</span>
       <div>
         <p>Delete both LinkedIn profiles. Create one under "Fanie Nel — Founder, Discovered Management" with a professional email.</p>
-        <small>Removes the FANJAM ghost. European clients find a current, credible profile instead of an abandoned one under a defunct company.</small>
+        <small>Removes the FANJAM ghost. European clients find a current, credible profile instead of an abandoned one.</small>
       </div>
     </div>
     <div class="plan-item">
@@ -830,7 +992,7 @@
       <span class="plan-num">05</span>
       <div>
         <p>Add a 100-word text block to discoveredmodels.co.za naming international markets, placements, and brand credits in plain readable text.</p>
-        <small>AI systems and search engines can't read images. Text-format credits are the only thing that gets indexed and recommended.</small>
+        <small>AI systems can't read images. Text-format credits are the only thing that gets indexed and recommended.</small>
       </div>
     </div>
   </div>
@@ -841,12 +1003,12 @@
   <div class="deck-logo">Booked.</div>
   <span class="slide-num">08 / 08</span>
   <div class="slide-label">Note from Booked</div>
-  <div class="pullquote">"A 5/20 doesn't reflect the quality of the work — it reflects how little of that work is visible to the systems that matter. The AI Overview for 'Discovered Models South Africa' is accurate. Google knows who Fanie Nel is. The problem is <em>everything between that knowledge and the moment a client tries to act on it.</em>"</div>
+  <div class="pullquote">"A 5/20 doesn't reflect the quality of the work — it reflects how little of that work is visible to the systems that matter. Google knows who Fanie Nel is. The problem is <em>everything between that knowledge and the moment a client tries to act on it.</em>"</div>
   <div class="gold-line"></div>
   <div class="closing-grid">
     <div class="closing-col">
       <h3>Who this is from</h3>
-      <p>Booked is one person. A decade modelling internationally — SA, Europe, Asia. Not observing the industry. Working in it. This is an industry peer looking at your setup through the specific lens of what a casting director, art director, or international agency actually sees when they search your name.</p>
+      <p>Booked is one person. A decade modelling internationally — SA, Europe, Asia. Not observing the industry. Working in it. This is an industry peer looking at your setup through the lens of what a casting director or international agency actually sees when they search your name.</p>
     </div>
     <div class="closing-col">
       <h3>Next step</h3>
@@ -870,22 +1032,22 @@
 </nav>
 
 <script>
-  function goto(n) { document.getElementById('s' + n).scrollIntoView({ behavior: 'smooth' }); }
+  function goto(n) { document.getElementById('s'+n).scrollIntoView({behavior:'smooth'}); }
   const dots = document.querySelectorAll('.nav-dot');
   const slides = document.querySelectorAll('.slide');
   const obs = new IntersectionObserver(entries => {
     entries.forEach(e => {
       if (e.isIntersecting) {
         const i = Array.from(slides).indexOf(e.target);
-        dots.forEach((d, j) => d.classList.toggle('active', j === i));
+        dots.forEach((d,j) => d.classList.toggle('active', j===i));
       }
     });
-  }, { threshold: 0.5 });
+  }, {threshold: 0.5});
   slides.forEach(s => obs.observe(s));
   document.addEventListener('keydown', e => {
     const cur = Array.from(dots).findIndex(d => d.classList.contains('active'));
-    if (e.key === 'ArrowDown' || e.key === 'ArrowRight') goto(Math.min(cur + 2, 8));
-    if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') goto(Math.max(cur, 1));
+    if (e.key==='ArrowDown'||e.key==='ArrowRight') goto(Math.min(cur+2,8));
+    if (e.key==='ArrowUp'||e.key==='ArrowLeft') goto(Math.max(cur,1));
   });
 </script>
 </body>
